@@ -20,9 +20,12 @@ country_src = add_source!(fabric, country)
     (Name, Country)::AttrType
     Winemaker::Ob
     country_code::Attr(Winemaker, Country)
-    wm_name::Attr(Winemaker, Name) # TODO "name" does not get entered
-    # fk constraint means that there is *some* schema out there
+    wm_name::Attr(Winemaker, Name)
 end
+
+# TODO "name" does not get entered
+# fk constraint means that there is *some* schema out there
+
 @acset_type Winemaker(SchWinemaker)
 winemaker = InMemory(Winemaker{Symbol, FK{Country}}())
 winemaker_src = add_source!(fabric, winemaker)
@@ -61,10 +64,12 @@ winecolor_src = add_source!(fabric, winecolor)
     Wine::Ob
     color::Attr(Wine, WineColor)
     maker::Attr(Wine, Winemaker)
-    # TODO winemaker?
     (code, name, desc, good_years)::Attr(Wine, Name)
     (bottle_price, half_price)::Attr(Wine, Price)
 end
+
+# TODO winemaker?
+
 @acset_type Wine(SchWine)
 wine = InMemory(Wine{Symbol, Int, FK{WineColor}, FK{Winemaker}}())
 wine_src = add_source!(fabric, wine)
@@ -75,8 +80,8 @@ add_fk!(fabric, wine_src, winecolor_src, :Wine!color => :WineColor!WineColor_id)
     Name::AttrType
     Food::Ob
     comments::Attr(Food, Name)
-    # two primary keys
 end
+ # two primary keys
 @acset_type Food(SchFood)
 food = InMemory(Food{Symbol}())
 food_src = add_source!(fabric, food)
@@ -118,38 +123,38 @@ add_fk!(fabric, winemerchant_src, wine_src, :WineMerchant!wine => :Wine!Wine_id)
 add_fk!(fabric, winemerchant_src, merchant_src, :WineMerchant!merchant => :Merchant!Merchant_id)
 
 # TODO all columns have the INTEGER type
-reflect!(fabric)
+# reflect!(fabric)
 
 # won't work until reflection happens
-add_part!(fabric, :Country, country=:Antarctica, code=:ANT) 
+# add_part!(fabric, :Country, country=:Antarctica, code=:ANT) 
 
-subpart(fabric, :name) 
+# subpart(fabric, :name) 
 # TODO use accessor (!) syntax here, since there are multiple columns called `name`
 
 # code needs to be an integer referencing country code
-add_part!(fabric, :Winemaker, wm_name=:BJs, country_code=FK{Country}(1))
+# add_part!(fabric, :Winemaker, wm_name=:BJs, country_code=FK{Country}(1))
 
-subpart(fabric, :country_code)
+# subpart(fabric, :country_code)
 
-subpart(fabric, :Winemaker => :wm_name)
+# subpart(fabric, :Winemaker => :wm_name)
 
-add_part!(fabric, :InfoSource, code=:something, desc="a nice description")
+# add_part!(fabric, :InfoSource, code=:something, desc="a nice description")
 
-subpart(fabric, :desc)
+# subpart(fabric, :desc)
 
 # TODO is Color a FK?
-add_part!(fabric, :RatingGuide, color=:red, desc=:description)
+# add_part!(fabric, :RatingGuide, color=:red, desc=:description)
 
-add_part!(fabric, :WineColor, color=:red)
+# add_part!(fabric, :WineColor, color=:red)
 
-add_part!(fabric, :Wine, color=FK{WineColor}(1), maker=FK{Winemaker}(1), code=:chianti, name=:Chianti, desc=:dry, good_years=:should_be_int, bottle_price=6, half_price=3)
+# add_part!(fabric, :Wine, color=FK{WineColor}(1), maker=FK{Winemaker}(1), code=:chianti, name=:Chianti, desc=:dry, good_years=:should_be_int, bottle_price=6, half_price=3)
 
-add_part!(fabric, :Food, comments=:should_be_string)
+# add_part!(fabric, :Food, comments=:should_be_string)
 
-add_part!(fabric, :WineFood, food=FK{Food}(1), wine=FK{Wine}(1))
+# add_part!(fabric, :WineFood, food=FK{Food}(1), wine=FK{Wine}(1))
 
-add_part!(fabric, :Merchant, name=:ABC)
+# add_part!(fabric, :Merchant, name=:ABC)
 
-add_part!(fabric, :WineMerchant, wine=FK{Wine}(1), merchant=FK{Merchant}(1), interval=:week, price=1)
+# add_part!(fabric, :WineMerchant, wine=FK{Wine}(1), merchant=FK{Merchant}(1), interval=:week, price=1)
 
-subpart(fabric, [:maker, :country_code, :country])
+# subpart(fabric, [:maker, :country_code, :country])

@@ -11,4 +11,8 @@ include("sqlacsets/SQLACSets.jl")
 # query db with acsets
 @reexport using .SQLACSets
 
+function foo()
+    println("Bar")
+end
+
 end

@@ -86,16 +86,16 @@ add_fk!(fabric, 3, 2, :Junction!class => :Class!Class_id)
 fabric.graph
 
 # Whether the constraints are valid is not yet enforced...they're just something we the users assert. To assure ourselves that this schema makes sense, we should be able to adapt our `join` method from Catlab to recobble the familiar Student-Class junction example. Because the data fabric presents a unified access layer for data, we'd need a catalog of available schema to find the information we need. In database science, reflection is the ability for databases to store information about their own schema. The fact that information about a database schema can also be represented as a schema is more plainly attributed to the mathematical formalism of schemas as attributed C-Sets. So naturally we implemented `reflect` for the data fabric:
-reflect!(fabric)
+# reflect!(fabric)
 
 # Let's query the names of the students and the available classes. The names of
 # the students are stored in-memory:
-subpart(fabric, :name)
+# subpart(fabric, :name)
 # TODO this must fail if the catalog is empty
 
 # Meanwhile the available subjects are stored in a SQLite database. We query
 # them as if they were an ACSet.
-subpart(fabric, :subject)
+# subpart(fabric, :subject)
 
 # What are the ID
 incident(fabric, :Philosophy, :subject)
@@ -108,7 +108,7 @@ function Base.insert!(fabric::DataFabric, df::Dict{Symbol, Vector{Symbol}})
       student_id = incident(fabric, student, :name)
       foreach(classes) do class
           class_id = incident(fabric, class, :subject)._id
-          # not idempotent
+          ## not idempotent
           add_part!(fabric, :Junction, student=first(student_id), class=first(class_id))
       end
   end
@@ -117,8 +117,8 @@ end
 
 insert!(fabric, df)
 
-subpart(fabric, :student)
-subpart(fabric, :name)
+# subpart(fabric, :student)
+# subpart(fabric, :name)
 
-subpart(fabric, :class)
-subpart(fabric, :subject)
+# subpart(fabric, :class)
+# subpart(fabric, :subject)

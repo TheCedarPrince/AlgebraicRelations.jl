@@ -1,11 +1,11 @@
-# activate the Project.toml at the root dir
+## activate the Project.toml at the root dir
 using ACSets
 using Catlab
 using AlgebraicRelations
 using SQLite, DBInterface
 using Catlab.WiringDiagrams.RelationDiagrams: UntypedNamedRelationDiagram
 
-include("examples/wineries.jl");
+include("../../../examples/wineries.jl");
 
 fabric.graph
 fabric.catalog
@@ -54,11 +54,11 @@ We set injective constraints (via `unique_index` when calling `@acset_type`) on 
   source_id::Attr(Source,SourceID)
   compose(pk, pk_of) == compose(pk_col, col_of)
   compose(fk_col, col_of) == compose(fk, from)
-  # compose(to, pk_of) != from
+  ## compose(to, pk_of) != from
 end
 
-# to_graphviz(TheorySQLSchema, graph_attrs=Dict(:size=>"7.5",:ratio=>"expand"))
-# to_graphviz(AlgebraicRelations.Fabric.SchERD, graph_attrs=Dict(:size=>"4.5",:ratio=>"expand"))
+## to_graphviz(TheorySQLSchema, graph_attrs=Dict(:size=>"7.5",:ratio=>"expand"))
+## to_graphviz(AlgebraicRelations.Fabric.SchERD, graph_attrs=Dict(:size=>"4.5",:ratio=>"expand"))
 
 @abstract_acset_type AbstractSQLSchema
 
@@ -72,24 +72,24 @@ sch_acs = @acset _SQLSchema{Symbol, DataType, Int} begin
     Source=nparts(fabric.catalog, :Source)
     conn=fabric.catalog[:, :conn]
     source_id=fabric.catalog[:, :source_id]
-    #
+    ##
     Table=nparts(fabric.catalog, :Table)
     tab_name=fabric.catalog[:, :tname]
     source=fabric.catalog[:, :source]
-    #
+    ##
     Column=nparts(fabric.catalog, :Column)
     col_name=fabric.catalog[:, :cname]
     col_type=[x ∈ [:PK,:FK] ? :Integer : x for x in nameof.(fabric.catalog[:, :type])]
     col_of=fabric.catalog[:, :table]
 end
 
-# add PKs
+## add PKs
 for pk_col in incident(fabric.catalog, PK, :type)
     pk = add_part!(sch_acs, :PK, pk_of=fabric.catalog[pk_col, :table])
     add_part!(sch_acs, :PK_Cols, pk=pk, pk_col=pk_col)
 end
 
-# add FKs
+## add FKs
 for fk in parts(fabric.catalog, :FK)
     from = fabric.catalog[fk, (:from, :table)]
     catalog_to_table = fabric.catalog[fk, (:to, :table)]
@@ -113,7 +113,7 @@ For a table with part ID `tab_id` get a dataframe
 that contains columns necessary to generate the table cells of the HTML node label
 """
 function get_cols_table(acs::T, tab_id) where {T<:AbstractSQLSchema}
-    # all deepcopys can be replaced when figure out ACSets.jl issue
+    ## all deepcopys can be replaced when figure out ACSets.jl issue
     tab_cols = deepcopy(incident(acs, tab_id, :col_of))    
     tab_pk = acs[incident(acs, tab_id, (:pk, :pk_of)), :pk_col]
     tab_fk = acs[incident(acs, tab_id, (:fk, :from)), :fk_col]
@@ -121,7 +121,7 @@ function get_cols_table(acs::T, tab_id) where {T<:AbstractSQLSchema}
     setdiff!(tab_fk, tab_pk_fk)
     setdiff!(tab_pk, tab_pk_fk)
     setdiff!(tab_cols, union(tab_fk, tab_pk, tab_pk_fk))
-    #
+    ##
     label_cells_df = DataFrame(
         name=acs[[tab_pk; tab_pk_fk; tab_fk; tab_cols], :col_name],
         type=acs[[tab_pk; tab_pk_fk; tab_fk; tab_cols], :col_type],
@@ -137,11 +137,11 @@ Given an acset of schema `SchSqlTables` and a table part ID `tab_id`, generate a
 """
 function make_label_table(acs::T, tab_id) where {T<:AbstractSQLSchema}
     label = String[]
-    # name of this table
+    ## name of this table
     tab_name = acs[tab_id, :tab_name]
-    # all cols of this table
+    ## all cols of this table
     tab_cols = get_cols_table(acs, tab_id)
-    # make the node header
+    ## make the node header
     push!(label, "$(tab_name) [label=<\n")
     push!(label, """
         <TABLE BORDER="0" CELLSPACING="0" CELLBORDER="1">
@@ -156,7 +156,7 @@ function make_label_table(acs::T, tab_id) where {T<:AbstractSQLSchema}
                 </TR>
         """)
     end
-    # close the table
+    ## close the table
     push!(label, """
         </TABLE>
     >];
@@ -173,9 +173,9 @@ function make_edges(acs::T) where {T<:AbstractSQLSchema}
     from_col = [acs[fk_cols, (:fk_col, :col_name)] for fk_cols in incident(acs, :, :fk)]
     to_col = [acs[pk_cols, (:pk_col, :col_name)] for pk_cols in incident(acs, acs[:, :to], :pk)]
     edges = String[]
-    # i indexes over tables
+    ## i indexes over tables
     for i in eachindex(from_tab)
-        # j indexes over cols (if a FK goes to a composite PK they have >1 col)
+        ## j indexes over cols (if a FK goes to a composite PK they have >1 col)
         for j in eachindex(from_col[i])
             push!(edges, "$(from_tab[i]):fk_$(from_col[i][j]):e -> $(to_tab[i]):pk_$(to_col[i][j]):w\n")
         end
@@ -200,6 +200,6 @@ function make_graphviz(acs::T) where {T<:AbstractSQLSchema}
     return join(dot, "")
 end
 
-# make it and visualize
+## make it and visualize
 dot_str = make_graphviz(sch_acs)
-clipboard(dot_str)
+## clipboard(dot_str)

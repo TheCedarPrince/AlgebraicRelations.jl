@@ -4,13 +4,13 @@ using AlgebraicRelations
 using SQLite, DBInterface
 # using Catlab.WiringDiagrams.RelationDiagrams: UntypedNamedRelationDiagram
 
-include("examples/wineries.jl");
+include("../../../examples/wineries.jl");
 
 fabric
 
 catalog(fabric)
 
-view_graphviz(fabric.graph) 
+# view_graphviz(fabric.graph) 
 
 diag = @relation (winemaker_name=winemaker_name) begin
     WineWinemaker(wwm_wine=wine, wwm_winemaker=winemaker_id)
@@ -21,9 +21,9 @@ diag = @relation (winemaker_name=winemaker_name) begin
     Grape(id=grape, color=color, species=species)
 end
 
-view_graphviz(to_graphviz(diag, box_labels=:name, junction_labels=false))
+# view_graphviz(to_graphviz(diag, box_labels=:name, junction_labels=false))
 
-view_graphviz(to_graphviz(diag, box_labels=true))
+# view_graphviz(to_graphviz(diag, box_labels=true))
 
 query(fabric, diag, (species=:GreenGrape, color=:Green, country=:Italy))
 
